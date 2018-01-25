@@ -33,20 +33,22 @@ public class RundeckService {
 
     private String rundeckURL;
     private String token;
-    private final String API_VERSION = "14";
+    private String asUser;
+    private final String API_VERSION = "20";
     private boolean ignoreSSL;
     private int timeout;
 
 
-    public RundeckService(String rundeckURL, String token, boolean ignoreSSL, int timeout) {
+    public RundeckService(String rundeckURL, String token, String asUser, boolean ignoreSSL, int timeout) {
         this.rundeckURL = rundeckURL;
         this.token = token;
         this.ignoreSSL = ignoreSSL;
         this.timeout = timeout;
+        this.asUser = asUser;
     }
 
-    public RundeckService(String rundeckURL, String token) {
-        this(rundeckURL, token, true, 30*1000);
+    public RundeckService(String rundeckURL, String token, String asUser) {
+        this(rundeckURL, token, asUser, true, 30*1000);
     }
 
     public long executeJob (String jobID) throws GeneralSecurityException, IOException {
@@ -57,9 +59,14 @@ public class RundeckService {
 
         String url = this.rundeckURL + "/api/" + API_VERSION + "/job/" + jobID + "/executions";
 
+
         Map<String, String> form = new HashMap<>();
         if (null != arguments && !"".equalsIgnoreCase(arguments.trim())) {
             form.put("argString",arguments);
+        }
+
+        if (null != this.asUser && !"".equalsIgnoreCase(this.asUser)) {
+            form.put("asUser",this.asUser);
         }
 
         JSONObject res = callRundeckJSON(url, "POST", form);
@@ -196,10 +203,11 @@ public class RundeckService {
         String rundeckURL = args[0];
         String token = args[1];
         String jobid = args[2];
+        String asUser = args[3];
 
         try {
 
-            RundeckService rd = new RundeckService(rundeckURL,token);
+            RundeckService rd = new RundeckService(rundeckURL,token,asUser);
             long id;
             id = rd.executeJob(jobid);
             System.out.println(id);

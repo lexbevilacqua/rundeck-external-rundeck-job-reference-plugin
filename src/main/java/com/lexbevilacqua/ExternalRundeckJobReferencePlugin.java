@@ -61,6 +61,12 @@ public class ExternalRundeckJobReferencePlugin implements NodeStepPlugin, Descri
                         .required(true)
                         .build())
                 .property(PropertyBuilder.builder()
+                        .string("asUser")
+                        .title("Run as")
+                        .description("User responsable for execution")
+                        .required(false)
+                        .build())
+                .property(PropertyBuilder.builder()
                         .string("jobID")
                         .title("Job UUID")
                         .description("Job UUID")
@@ -85,6 +91,7 @@ public class ExternalRundeckJobReferencePlugin implements NodeStepPlugin, Descri
 
         String rundeckURL = options.containsKey("rundeckURL") ? options.get("rundeckURL").toString() : null;
         String token = options.containsKey("token") ? options.get("token").toString() : null;
+        String asUser = options.containsKey("asUser") ? options.get("asUser").toString() : null;
         String jobID = options.containsKey("jobID") ? options.get("jobID").toString() : null;
         int secondsWait = options.containsKey("secondsWait") ? Integer.parseInt(options.get("secondsWait").toString())*1000 : 30000;
         String arguments = options.containsKey("arguments") ? options.get("arguments").toString() : null;
@@ -93,7 +100,7 @@ public class ExternalRundeckJobReferencePlugin implements NodeStepPlugin, Descri
 
         try {
 
-            RundeckService rd = new RundeckService(rundeckURL,token);
+            RundeckService rd = new RundeckService(rundeckURL,token,asUser);
             long id;
             id = rd.executeJob(jobID,arguments);
             log.log(2,"ExecutionID: " + id);
